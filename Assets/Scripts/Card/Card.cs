@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class Card : MonoBehaviour, IPointerClickHandler
 {
     public int CardID { get; private set; }
-    private bool isFlipped = false;
+    public bool isFlipped = false;
     public bool IsMatched { get; private set; } = false;
 
     public System.Action<Card> OnCardSelected;

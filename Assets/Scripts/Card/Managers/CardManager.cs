@@ -8,16 +8,16 @@ public class CardManager : MonoBehaviour
     public Transform cardContainer; // Kartlarýn yerleþtirileceði ana obje (container)
 
     private List<Card> cards = new List<Card>(); // Kartlarý depolayacaðýmýz liste
-    private Card firstSelectedCard; // Ýlk seçilen kart
-    private Card secondSelectedCard; // Ýkinci seçilen kart
     private ScoreManager scoreManager;
 
     public GridLayout3D gridLayout; // Grid düzenleyici referansý
+    private LevelManager levelManager; // LevelManager referansý
 
     private void Start()
     {
-        // ScoreManager'i bulup referans al
+        // ScoreManager ve LevelManager'i bulup referans al
         scoreManager = FindObjectOfType<ScoreManager>();
+        levelManager = FindObjectOfType<LevelManager>();
     }
 
     // Kartlarý sahneye yerleþtirme
@@ -71,46 +71,33 @@ public class CardManager : MonoBehaviour
         return list;
     }
 
+    // Seçilen kartlarý yönetme
     private void OnCardSelected(Card selectedCard)
     {
-        if (firstSelectedCard == null)
-        {
-            firstSelectedCard = selectedCard;
-            firstSelectedCard.FlipCard();
-        }
-        else if (secondSelectedCard == null && firstSelectedCard != selectedCard)
-        {
-            secondSelectedCard = selectedCard;
-            secondSelectedCard.FlipCard();
-            StartCoroutine(CheckMatch());
-        }
-    }
+        if (selectedCard.isFlipped || selectedCard.IsMatched)
+            return; // Zaten açýk veya eþleþmiþ kartlarý iþlememize gerek yok
 
-    private IEnumerator CheckMatch()
-    {
-        yield return new WaitForSeconds(1f);
+        selectedCard.FlipCard();
 
-        if (firstSelectedCard.CardID == secondSelectedCard.CardID)
+        // Ayný ID'ye sahip açýk diðer kartlarý kontrol et
+        foreach (Card card in cards)
         {
-            firstSelectedCard.SetMatched();
-            secondSelectedCard.SetMatched();
-            scoreManager.IncreaseScore(10);
-        }
-        else
-        {
-            firstSelectedCard.FlipCard();
-            secondSelectedCard.FlipCard();
-            scoreManager.DecreaseScore(5);
-        }
+            if (card != selectedCard && card.isFlipped && card.CardID == selectedCard.CardID)
+            {
+                // Eþleþme saðlandý
+                selectedCard.SetMatched();
+                card.SetMatched();
+                scoreManager.IncreaseScore(10);
 
-        firstSelectedCard = null;
-        secondSelectedCard = null;
+                // Tüm kartlar eþleþti mi kontrol et
+                if (cards.TrueForAll(c => c.IsMatched))
+                {
+                    scoreManager.ShowFinalScore(); // Son skoru göster
+                    levelManager.NextLevel(); // Sonraki seviyeye geç
+                }
 
-        // Tüm kartlar eþleþtiyse bir sonraki seviyeye geç
-        if (cards.TrueForAll(card => card.IsMatched))
-        {
-            scoreManager.ShowFinalScore();
-            FindObjectOfType<LevelManager>().NextLevel();
+                return; // Eþleþmeyi bulduk ve iþledik
+            }
         }
     }
 }
