@@ -3,31 +3,31 @@ using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
-    public Text scoreText; // Skorun görüneceði UI Text
+    public Text scoreText; // UI Text where the score will be displayed
     private int score = 0;
 
-    // Skoru baþlat
+    // Initialize the score
     private void Start()
     {
         UpdateScoreUI();
     }
 
-    // Skoru arttýr
+    // Increase the score
     public void IncreaseScore(int amount)
     {
         score += amount;
         UpdateScoreUI();
     }
 
-    // Skoru azalt
+    // Decrease the score
     public void DecreaseScore(int amount)
     {
         score -= amount;
-        if (score < 0) score = 0; // Negatif skor olmasýn
+        if (score < 0) score = 0; // Ensure score does not go negative
         UpdateScoreUI();
     }
 
-    // Skor UI'ýný güncelle
+    // Update the score UI
     private void UpdateScoreUI()
     {
         if (scoreText != null)
@@ -36,10 +36,10 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    // Oyunun tamamlanma durumu
+    // Display the final score when the game is complete
     public void ShowFinalScore()
     {
-        // Oyunun tamamlandýðýný gösteren bir UI veya animasyon tetikleyebiliriz
+        // Here we could trigger a UI or animation to show that the game is finished
         Debug.Log("Game Finished! Final Score: " + score);
     }
 }

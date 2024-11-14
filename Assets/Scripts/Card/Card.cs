@@ -27,14 +27,14 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public void FlipCard()
     {
         isFlipped = !isFlipped;
-        // Kartý çevirme animasyonu veya görsel deðiþimi burada yapýlacak
+        // Animation or visual change for flipping the card will be handled here
         Debug.Log("Card flipped: " + CardID);
     }
 
     public void SetMatched()
     {
         IsMatched = true;
-        // Kartýn eþleþme durumu animasyonu veya efekti burada yapýlacak
+        // Animation or effect for card matching status will be handled here
         Debug.Log("Card matched: " + CardID);
     }
 }

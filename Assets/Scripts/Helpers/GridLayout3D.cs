@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class GridLayout3D : MonoBehaviour
 {
-    public float spacingY = 1.5f; // Kartlar arasýndaki dikey boþluk
-    public float spacingX = 1.5f; // Kartlar arasýndaki yatay boþluk
-    public float layoutPercentage = 0.8f; // Ekranýn % kaçýnýn kullanýlmasý gerektiði (örneðin %80 için 0.8)
+    public float spacingY = 1.5f; // Vertical spacing between cards
+    public float spacingX = 1.5f; // Horizontal spacing between cards
+    public float layoutPercentage = 0.8f; // Percentage of the screen to use (e.g., 0.8 for 80%)
 
-    // Kartlarý bir ýzgaraya dizmek için metot
+    // Method to arrange cards in a grid
     public void ArrangeCards(List<GameObject> cards, int rows, int columns)
     {
-        // Kameranýn ekran boyutlarýný alýyoruz
+        // Get the screen dimensions from the camera
         Camera mainCamera = Camera.main;
         if (mainCamera == null)
         {
@@ -18,33 +18,33 @@ public class GridLayout3D : MonoBehaviour
             return;
         }
 
-        // Ekranýn ortografik boyutlarýný hesapla
-        float screenHeight = 2f * mainCamera.orthographicSize * layoutPercentage; // Y ekseni boyunca ekran yüksekliðinin %80'i
-        float screenWidth = screenHeight * mainCamera.aspect; // X ekseni boyunca ekran geniþliði, en-boy oranýna baðlý
+        // Calculate the screen's orthographic dimensions
+        float screenHeight = 2f * mainCamera.orthographicSize * layoutPercentage; // 80% of the screen height along the Y-axis
+        float screenWidth = screenHeight * mainCamera.aspect; // Width of the screen along the X-axis based on the aspect ratio
 
-        // Dizinin toplam geniþliði ve yüksekliði hesaplanýr
+        // Calculate the total grid width and height
         float gridWidth = (columns - 1) * spacingX;
         float gridHeight = (rows - 1) * spacingY;
 
-        // Eðer grid yüksekliði ekranýn %80'ini aþýyorsa, columns deðerini artýrarak daha fazla sütun ekleyin
+        // If grid height exceeds 80% of screen height, add more columns to expand horizontally
         while (gridHeight > screenHeight)
         {
             columns++;
-            gridWidth = (columns - 1) * spacingX; // Geniþliði yeni columns deðerine göre güncelle
-            gridHeight = Mathf.Ceil((float)cards.Count / columns) * spacingY; // Yüksekliði yeniden hesapla
+            gridWidth = (columns - 1) * spacingX; // Update grid width with new column count
+            gridHeight = Mathf.Ceil((float)cards.Count / columns) * spacingY; // Recalculate grid height
         }
 
-        // Baþlangýç pozisyonunu belirle
+        // Determine the starting position of the grid
         Vector3 startPosition = new Vector3(
-            -screenWidth / 2 + (screenWidth - gridWidth) / 2, // X ekseninde %80'lik alandan ortalanmýþ baþlangýç noktasý
-            screenHeight / 2 - (screenHeight - gridHeight) / 2, // Y ekseninde %80'lik alandan ortalanmýþ baþlangýç noktasý
+            -screenWidth / 2 + (screenWidth - gridWidth) / 2, // Centered start position along X-axis within 80% area
+            screenHeight / 2 - (screenHeight - gridHeight) / 2, // Centered start position along Y-axis within 80% area
             0
         );
 
-        // Kart dizini
+        // Card index
         int index = 0;
 
-        // Kartlarý satýr ve sütunlara göre konumlandýr
+        // Position cards in rows and columns
         for (int row = 0; row < Mathf.CeilToInt((float)cards.Count / columns); row++)
         {
             for (int col = 0; col < columns; col++)
@@ -52,16 +52,16 @@ public class GridLayout3D : MonoBehaviour
                 if (index >= cards.Count)
                     return;
 
-                // Kartýn pozisyonunu hesapla, X ve Y eksenine göre ortalanmýþ olacak þekilde
+                // Calculate the position of the card, centered on the X and Y axes
                 Vector3 position = startPosition + new Vector3(
                     col * spacingX,
                     -row * spacingY,
                     0);
 
-                // Kartý pozisyonla
+                // Set the card's position
                 cards[index].transform.position = position;
 
-                // Bir sonraki karta geç
+                // Move to the next card
                 index++;
             }
         }

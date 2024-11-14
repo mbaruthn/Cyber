@@ -4,27 +4,27 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    public CardManager cardManager; // Kartlarý yöneten sýnýf
-    public int currentLevel = 1; // Baþlangýç seviyesi
-    private int maxLevel = 10; // Maksimum seviye sayýsý
+    public CardManager cardManager; // Class to manage cards
+    public int currentLevel = 1; // Starting level
+    private int maxLevel = 10; // Maximum level count
 
     private void Start()
     {
-        StartLevel(currentLevel); // Ýlk seviyeyi baþlat
+        StartLevel(currentLevel); // Start the first level
     }
 
-    // Seviyeyi baþlatma
+    // Start a specific level
     private void StartLevel(int level)
     {
         Vector2 gridSize = GetGridSize(level);
         int rows = (int)gridSize.x;
         int columns = (int)gridSize.y;
 
-        cardManager.InitializeCards(rows, columns); // Kartlarý yerleþtir
+        cardManager.InitializeCards(rows, columns); // Place cards on the grid
         Debug.Log($"Level {level} started with grid {rows}x{columns}");
     }
 
-    // Bir sonraki seviyeye geçiþ yap
+    // Move to the next level
     public void NextLevel()
     {
         if (currentLevel < maxLevel)
@@ -42,7 +42,7 @@ public class LevelManager : MonoBehaviour
     {
         int rows, columns;
 
-        // Belirli seviyelere göre satýr ve sütun sayýsýný düzenli artýr
+        // Increment the number of rows and columns based on the level
         switch (level)
         {
             case 1:
@@ -91,10 +91,10 @@ public class LevelManager : MonoBehaviour
                 break;
         }
 
-        // Kart sayýsýnýn çift olmasý gerektiðinden, satýr ve sütun sayýsýný kontrol et
+        // Ensure the number of cards is even, adjusting rows and columns if necessary
         if ((rows * columns) % 2 != 0)
         {
-            columns += 1; // Kart sayýsýný çift yapmak için bir sütun ekliyoruz
+            columns += 1; // Add one column to make the card count even
         }
 
         return new Vector2(rows, columns);

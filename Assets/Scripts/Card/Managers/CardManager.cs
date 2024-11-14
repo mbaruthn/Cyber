@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class CardManager : MonoBehaviour
 {
-    public GameObject cardPrefab; // Kart prefab referansý
-    public Transform cardContainer; // Kartlarýn yerleþtirileceði ana obje (container)
+    public GameObject cardPrefab; // Reference to the card prefab
+    public Transform cardContainer; // Main container where cards will be placed
 
-    private List<Card> cards = new List<Card>(); // Kartlarý depolayacaðýmýz liste
+    private List<Card> cards = new List<Card>(); // List to store all cards
     private ScoreManager scoreManager;
 
-    public GridLayout3D gridLayout; // Grid düzenleyici referansý
-    private LevelManager levelManager; // LevelManager referansý
+    public GridLayout3D gridLayout; // Reference to the grid layout manager
+    private LevelManager levelManager; // Reference to the LevelManager
 
     private void Start()
     {
-        // ScoreManager ve LevelManager'i bulup referans al
+        // Find and reference the ScoreManager and LevelManager
         scoreManager = FindObjectOfType<ScoreManager>();
         levelManager = FindObjectOfType<LevelManager>();
     }
 
-    // Kartlarý sahneye yerleþtirme
+    // Place cards on the scene
     public void InitializeCards(int rows, int columns)
     {
         int totalCards = rows * columns;
@@ -33,14 +33,14 @@ public class CardManager : MonoBehaviour
             cardIDs.Add(i);
             cardIDs.Add(i);
         }
-        cardIDs = ShuffleList(cardIDs); // Karýþtýrýlmýþ kart listesi
+        cardIDs = ShuffleList(cardIDs); // Shuffled list of card IDs
 
         for (int i = 0; i < totalCards; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab, cardContainer);
             Card card = cardObj.GetComponent<Card>();
             card.SetCardID(cardIDs[i]);
-            card.OnCardSelected = OnCardSelected; // Kartýn seçilme olayýný baðla
+            card.OnCardSelected = OnCardSelected; // Bind the card selection event
             cards.Add(card);
         }
 
@@ -49,13 +49,13 @@ public class CardManager : MonoBehaviour
 
     public void ClearCards()
     {
-        // Kart listesindeki her kartý sahneden kaldýr ve bellekten temizle
+        // Remove each card from the scene and free up memory
         foreach (Card card in cards)
         {
             Destroy(card.gameObject);
         }
 
-        // Kart listesi temizleniyor
+        // Clear the card list
         cards.Clear();
     }
 
@@ -71,32 +71,32 @@ public class CardManager : MonoBehaviour
         return list;
     }
 
-    // Seçilen kartlarý yönetme
+    // Manage selected cards
     private void OnCardSelected(Card selectedCard)
     {
         if (selectedCard.isFlipped || selectedCard.IsMatched)
-            return; // Zaten açýk veya eþleþmiþ kartlarý iþlememize gerek yok
+            return; // Skip already flipped or matched cards
 
         selectedCard.FlipCard();
 
-        // Ayný ID'ye sahip açýk diðer kartlarý kontrol et
+        // Check for other flipped cards with the same ID
         foreach (Card card in cards)
         {
             if (card != selectedCard && card.isFlipped && card.CardID == selectedCard.CardID)
             {
-                // Eþleþme saðlandý
+                // Match found
                 selectedCard.SetMatched();
                 card.SetMatched();
                 scoreManager.IncreaseScore(10);
 
-                // Tüm kartlar eþleþti mi kontrol et
+                // Check if all cards are matched
                 if (cards.TrueForAll(c => c.IsMatched))
                 {
-                    scoreManager.ShowFinalScore(); // Son skoru göster
-                    levelManager.NextLevel(); // Sonraki seviyeye geç
+                    scoreManager.ShowFinalScore(); // Show the final score
+                    levelManager.NextLevel(); // Move to the next level
                 }
 
-                return; // Eþleþmeyi bulduk ve iþledik
+                return; // Match processed
             }
         }
     }
