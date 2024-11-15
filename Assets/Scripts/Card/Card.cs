@@ -29,6 +29,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         isFlipped = !isFlipped;
         // Animation or visual change for flipping the card will be handled here
         Debug.Log("Card flipped: " + CardID);
+        this.GetComponent<Animator>().SetBool("CardFlipped", isFlipped);
     }
 
     public void SetMatched()
