@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardManager : MonoBehaviour
+public class CardManager : MonoBehaviour, ICardManager
 {
     public GameObject cardPrefab; // Reference to the card prefab
     public Transform cardContainer; // Main container where cards will be placed

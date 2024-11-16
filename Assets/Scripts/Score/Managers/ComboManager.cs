@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ComboManager : MonoBehaviour
+public class ComboManager : MonoBehaviour, IComboManager
 {
     public Text comboText; // UI Text to display combo messages
     private int comboMultiplier = 1; // Combo multiplier starts at 1

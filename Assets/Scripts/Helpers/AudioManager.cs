@@ -42,6 +42,7 @@ public class AudioManager : MonoBehaviour
         if (!backgroundMusicSource.isPlaying)
         {
             backgroundMusicSource.Play();
+            backgroundMusicSource.loop = true;
         }
     }
 

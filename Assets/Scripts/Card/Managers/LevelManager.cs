@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // To manage UI elements
+using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
@@ -12,8 +12,14 @@ public class LevelManager : MonoBehaviour
     public Text endGameText; // UI Text to display end game message
     public float restartDelay = 3f; // Delay before restarting the game
 
+    private IScoreManager scoreManager;
+    private IComboManager comboManager;
+
     private void Start()
     {
+        // Assign interfaces
+        scoreManager = FindObjectOfType<ScoreManager>();
+        comboManager = FindObjectOfType<ComboManager>();
 
         GameObject.Find("restartGame").GetComponent<Button>().onClick.AddListener(RestartGame);
 
@@ -42,7 +48,7 @@ public class LevelManager : MonoBehaviour
         {
             currentLevel++;
             StartLevel(currentLevel);
-            
+
             // Play level complete sound
             AudioManager.Instance.PlaySFX(AudioManager.Instance.levelCompleteClip);
 
@@ -129,7 +135,7 @@ public class LevelManager : MonoBehaviour
         }
 
         // Reset score and save progress
-        FindObjectOfType<ScoreManager>().SetScore(0);
+        scoreManager.SetScore(0);
         SaveLoadManager.SaveGame(new SaveData()); // Reset save data
 
         // Restart the game after a delay
@@ -137,7 +143,7 @@ public class LevelManager : MonoBehaviour
     }
 
     private void RestartGame()
-    { 
+    {
         // Play restart sound
         AudioManager.Instance.PlaySFX(AudioManager.Instance.gameRestartClip);
 
@@ -145,8 +151,8 @@ public class LevelManager : MonoBehaviour
         {
             endGameText.transform.parent.gameObject.SetActive(false); // Hide the message
         }
-        FindObjectOfType<ScoreManager>().ResetScore(); // Reset score
-        FindObjectOfType<ComboManager>().ResetCombo(); // Reset combos
+        scoreManager.ResetScore(); // Reset score
+        comboManager.ResetCombo(); // Reset combos
         currentLevel = 1;
         StartLevel(currentLevel);
         SaveGame();
@@ -158,8 +164,8 @@ public class LevelManager : MonoBehaviour
         {
             currentLevel = currentLevel, // Save the current level
             cardLayout = cardManager.GetCurrentCardLayout(), // Save card layout
-            score = FindObjectOfType<ScoreManager>().GetScore(), // Save current score
-            totalCombos = FindObjectOfType<ComboManager>().GetTotalCombos() // Save total combos
+            score = scoreManager.GetScore(), // Save current score
+            totalCombos = comboManager.GetTotalCombos() // Save total combos
         };
 
         SaveLoadManager.SaveGame(saveData);
@@ -179,8 +185,8 @@ public class LevelManager : MonoBehaviour
         {
             currentLevel = loadedData.currentLevel; // Load the current level
             cardManager.SetCardLayout(loadedData.cardLayout); // Load card layout
-            FindObjectOfType<ScoreManager>().SetScore(loadedData.score); // Load score
-            FindObjectOfType<ComboManager>().SetTotalCombos(loadedData.totalCombos); // Load combos
+            scoreManager.SetScore(loadedData.score); // Load score
+            comboManager.SetTotalCombos(loadedData.totalCombos); // Load combos
 
             Debug.Log("Game Loaded!");
         }
