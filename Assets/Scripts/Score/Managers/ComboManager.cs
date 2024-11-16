@@ -6,9 +6,10 @@ public class ComboManager : MonoBehaviour
     public Text comboText; // UI Text to display combo messages
     private int comboMultiplier = 1; // Combo multiplier starts at 1
     private float comboTimer = 0f;
-    public float comboDuration = 2f; // Duration for the combo in seconds
+    public float comboDuration = 5f; // Duration for the combo in seconds
     public bool isComboActive = false; // Tracks if combo is active
     private int totalCombos = 0; // Tracks total combos since game start
+    public Slider comboTimerSlider; // Slider to display remaining combo time
 
     // Initialize the combo system
     private void Start()
@@ -75,8 +76,8 @@ public class ComboManager : MonoBehaviour
     {
         if (comboText != null)
         {
+            comboText.transform.parent.gameObject.SetActive(true);
             comboText.text = "Combo x" + comboMultiplier;
-            comboText.gameObject.SetActive(true);
             CancelInvoke("HideComboMessage");
             Invoke("HideComboMessage", 2f); // Hide message after 2 seconds
         }
@@ -87,7 +88,7 @@ public class ComboManager : MonoBehaviour
     {
         if (comboText != null)
         {
-            comboText.gameObject.SetActive(false);
+            comboText.transform.parent.gameObject.SetActive(false);
         }
     }
 
@@ -98,11 +99,23 @@ public class ComboManager : MonoBehaviour
         {
             comboTimer -= Time.deltaTime;
 
+            // Update the slider with the remaining combo time
+            if (comboTimerSlider != null)
+            {
+                comboTimerSlider.maxValue = comboDuration;
+                comboTimerSlider.value = comboTimer;
+            }
             // If combo timer runs out, reset combo
             if (comboTimer <= 0f)
             {
                 ResetCombo();
             }
+
+            comboTimerSlider.gameObject.SetActive(true);
+        }
+        else
+        {
+            comboTimerSlider.gameObject.SetActive(false);
         }
     }
 

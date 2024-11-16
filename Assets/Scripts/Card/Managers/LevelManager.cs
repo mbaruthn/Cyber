@@ -125,7 +125,7 @@ public class LevelManager : MonoBehaviour
         if (endGameText != null)
         {
             endGameText.text = "Congratulations! Restarting...";
-            endGameText.gameObject.SetActive(true);
+            endGameText.transform.parent.gameObject.SetActive(true);
         }
 
         // Reset score and save progress
@@ -143,7 +143,7 @@ public class LevelManager : MonoBehaviour
 
         if (endGameText != null)
         {
-            endGameText.gameObject.SetActive(false); // Hide the message
+            endGameText.transform.parent.gameObject.SetActive(false); // Hide the message
         }
         FindObjectOfType<ScoreManager>().ResetScore(); // Reset score
         FindObjectOfType<ComboManager>().ResetCombo(); // Reset combos
@@ -168,6 +168,11 @@ public class LevelManager : MonoBehaviour
 
     public void LoadGame()
     {
+        if (endGameText != null)
+        {
+            endGameText.transform.parent.gameObject.SetActive(false); // Hide the message
+        }
+
         SaveData loadedData = SaveLoadManager.LoadGame();
 
         if (loadedData != null)
