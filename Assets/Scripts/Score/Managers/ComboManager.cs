@@ -6,8 +6,8 @@ public class ComboManager : MonoBehaviour
     public Text comboText; // UI Text to display combo messages
     private int comboMultiplier = 1; // Combo multiplier starts at 1
     private float comboTimer = 0f;
-    private float comboDuration = 2f; // Duration for the combo in seconds
-    private bool isComboActive = false; // Tracks if combo is active
+    public float comboDuration = 2f; // Duration for the combo in seconds
+    public bool isComboActive = false; // Tracks if combo is active
     private int totalCombos = 0; // Tracks total combos since game start
 
     // Initialize the combo system
@@ -15,6 +15,17 @@ public class ComboManager : MonoBehaviour
     {
         LoadComboData(); // Load saved combo data
         ResetCombo();
+    }
+
+    // Trigger combo activation
+    public void ActivateCombo()
+    {
+        if (!isComboActive)
+        {
+            isComboActive = true;
+            comboMultiplier = 0; // Start combo with multiplier 1
+            comboTimer = comboDuration;
+        }
     }
 
     // Increase the combo multiplier
@@ -25,16 +36,8 @@ public class ComboManager : MonoBehaviour
             comboMultiplier++;
             comboTimer = comboDuration; // Reset combo timer
             ShowComboMessage();
+            totalCombos++; // Increment total combo count
         }
-        else
-        {
-            isComboActive = true;
-            comboMultiplier = 2; // Start the combo multiplier
-            comboTimer = comboDuration;
-            ShowComboMessage();
-        }
-
-        totalCombos++; // Increment total combo count
     }
 
     // Reset the combo
@@ -49,7 +52,7 @@ public class ComboManager : MonoBehaviour
     // Get the current combo multiplier
     public int GetComboMultiplier()
     {
-        return comboMultiplier;
+        return isComboActive ? comboMultiplier : 1; // Return 1 if combo is not active
     }
 
     // Get total combos (for saving)

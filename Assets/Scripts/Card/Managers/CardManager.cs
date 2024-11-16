@@ -135,8 +135,13 @@ public class CardManager : MonoBehaviour
             matchedCards.Add(firstCard); // Lock the matched cards
             matchedCards.Add(secondCard);
 
+            if (!comboManager.isComboActive)
+            {
+                comboManager.ActivateCombo();
+            }
+
             // Update score with combo multiplier
-            if (comboManager != null)
+            if (comboManager != null && comboManager.isComboActive)
             {
                 comboManager.IncreaseCombo(); // Increase combo multiplier
                 int comboMultiplier = comboManager.GetComboMultiplier();
