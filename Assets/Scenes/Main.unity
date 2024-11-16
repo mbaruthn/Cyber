@@ -788,7 +788,7 @@ MonoBehaviour:
   levelCompleteClip: {fileID: 8300000, guid: 7509c6af857576843bb55f77b0f99b9d, type: 3}
   cardRevealClip: {fileID: 8300000, guid: e7c19742de23de54db30543dd24794b4, type: 3}
   gameRestartClip: {fileID: 8300000, guid: e7c19742de23de54db30543dd24794b4, type: 3}
-  buttonClickClip: {fileID: 8300000, guid: f9f774a8ac38e0d4387d52f7c4af0ba3, type: 3}
+  buttonClickClip: {fileID: 8300000, guid: f81bef26eef8264458109502ab761adf, type: 3}
   comboClip: {fileID: 8300000, guid: c438d69a4e470504b8b77e2fea54596c, type: 3}
   matchSuccessClip: {fileID: 8300000, guid: 9f48a413fbb9faa4f901267e778e2c30, type: 3}
   missmatchClip: {fileID: 8300000, guid: f9f774a8ac38e0d4387d52f7c4af0ba3, type: 3}
@@ -1134,7 +1134,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1104563937}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 730186155}
+        m_TargetAssemblyTypeName: AudioManager, Assembly-CSharp
+        m_MethodName: PlaySFX
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 8300000, guid: f81bef26eef8264458109502ab761adf,
+            type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1104563937
 MonoBehaviour:
   m_ObjectHideFlags: 0

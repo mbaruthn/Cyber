@@ -17,6 +17,8 @@ public class CardManager : MonoBehaviour, ICardManager
     private List<Card> activeSelection = new List<Card>(); // Current pair being checked
     private HashSet<Card> matchedCards = new HashSet<Card>(); // Cards that are locked in matched state
 
+    private Coroutine showCardsCoroutine; // Reference to the coroutine to manage its execution
+
     private void Start()
     {
         // Find and reference the ScoreManager, ComboManager, and LevelManager
@@ -52,10 +54,14 @@ public class CardManager : MonoBehaviour, ICardManager
         gridLayout.ArrangeCards(cards.ConvertAll(c => c.gameObject), rows, columns);
 
         // Show all cards briefly before hiding them
-        StartCoroutine(ShowAllCardsTemporarily());
+        if (showCardsCoroutine != null)
+        {
+            StopCoroutine(showCardsCoroutine); // Stop any ongoing coroutine
+        }
+        showCardsCoroutine = StartCoroutine(ShowAllCardsTemporarily());
     }
 
-    private IEnumerator ShowAllCardsTemporarily()
+    public IEnumerator ShowAllCardsTemporarily()
     {
         foreach (var card in cards)
         {
@@ -74,10 +80,19 @@ public class CardManager : MonoBehaviour, ICardManager
                 card.FlipCard(); // Hide all unmatched cards
             }
         }
+
+        showCardsCoroutine = null; // Reset the coroutine reference
     }
 
     public void ClearCards()
     {
+        // Stop any ongoing coroutine to avoid issues
+        if (showCardsCoroutine != null)
+        {
+            StopCoroutine(showCardsCoroutine);
+            showCardsCoroutine = null;
+        }
+
         // Remove each card from the scene and free up memory
         foreach (Card card in cards)
         {

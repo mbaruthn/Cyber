@@ -60,7 +60,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Clicked!");
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.buttonClickClip);
         if (!isFlipped && !IsMatched && OnCardSelected != null)
         {
             OnCardSelected.Invoke(this);
