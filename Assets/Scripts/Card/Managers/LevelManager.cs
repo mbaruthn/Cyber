@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // To manage UI elements
 
 public class LevelManager : MonoBehaviour
 {
@@ -8,9 +9,16 @@ public class LevelManager : MonoBehaviour
     public int currentLevel = 1; // Starting level
     private int maxLevel = 10; // Maximum level count
 
+    public Text endGameText; // UI Text to display end game message
+    public float restartDelay = 3f; // Delay before restarting the game
+
     private void Start()
     {
-        StartLevel(currentLevel); // Start the first level
+        // Attempt to load game data
+        LoadGame();
+
+        // Start the current level (from loaded data or default)
+        StartLevel(currentLevel);
     }
 
     // Start a specific level
@@ -31,10 +39,13 @@ public class LevelManager : MonoBehaviour
         {
             currentLevel++;
             StartLevel(currentLevel);
+
+            // Save progress
+            SaveGame();
         }
         else
         {
-            Debug.Log("Congratulations! You've completed all levels.");
+            EndGame();
         }
     }
 
@@ -98,5 +109,68 @@ public class LevelManager : MonoBehaviour
         }
 
         return new Vector2(rows, columns);
+    }
+
+    private void EndGame()
+    {
+        Debug.Log("Game Completed! Restarting...");
+
+        // Show end game message
+        if (endGameText != null)
+        {
+            endGameText.text = "Congratulations! Restarting...";
+            endGameText.gameObject.SetActive(true);
+        }
+
+        // Reset score and save progress
+        FindObjectOfType<ScoreManager>().SetScore(0);
+        SaveLoadManager.SaveGame(new SaveData()); // Reset save data
+
+        // Restart the game after a delay
+        Invoke(nameof(RestartGame), restartDelay);
+    }
+
+    private void RestartGame()
+    {
+        if (endGameText != null)
+        {
+            endGameText.gameObject.SetActive(false); // Hide the message
+        }
+
+        currentLevel = 1;
+        StartLevel(currentLevel);
+    }
+
+    public void SaveGame()
+    {
+        SaveData saveData = new SaveData
+        {
+            currentLevel = currentLevel, // Save the current level
+            cardLayout = cardManager.GetCurrentCardLayout(), // Save card layout
+            score = FindObjectOfType<ScoreManager>().GetScore(), // Save current score
+            totalCombos = FindObjectOfType<ComboManager>().GetTotalCombos() // Save total combos
+        };
+
+        SaveLoadManager.SaveGame(saveData);
+        Debug.Log("Game Saved!");
+    }
+
+    public void LoadGame()
+    {
+        SaveData loadedData = SaveLoadManager.LoadGame();
+
+        if (loadedData != null)
+        {
+            currentLevel = loadedData.currentLevel; // Load the current level
+            cardManager.SetCardLayout(loadedData.cardLayout); // Load card layout
+            FindObjectOfType<ScoreManager>().SetScore(loadedData.score); // Load score
+            FindObjectOfType<ComboManager>().SetTotalCombos(loadedData.totalCombos); // Load combos
+
+            Debug.Log("Game Loaded!");
+        }
+        else
+        {
+            Debug.LogWarning("No save data found. Starting a new game.");
+        }
     }
 }

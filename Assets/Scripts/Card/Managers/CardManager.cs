@@ -9,14 +9,19 @@ public class CardManager : MonoBehaviour
 
     private List<Card> cards = new List<Card>(); // List to store all cards
     private ScoreManager scoreManager;
+    private ComboManager comboManager; // Reference to the ComboManager
 
     public GridLayout3D gridLayout; // Reference to the grid layout manager
     private LevelManager levelManager; // Reference to the LevelManager
 
+    private List<Card> activeSelection = new List<Card>(); // Current pair being checked
+    private HashSet<Card> matchedCards = new HashSet<Card>(); // Cards that are locked in matched state
+
     private void Start()
     {
-        // Find and reference the ScoreManager and LevelManager
+        // Find and reference the ScoreManager, ComboManager, and LevelManager
         scoreManager = FindObjectOfType<ScoreManager>();
+        comboManager = FindObjectOfType<ComboManager>();
         levelManager = FindObjectOfType<LevelManager>();
     }
 
@@ -45,6 +50,27 @@ public class CardManager : MonoBehaviour
         }
 
         gridLayout.ArrangeCards(cards.ConvertAll(c => c.gameObject), rows, columns);
+
+        // Show all cards briefly before hiding them
+        StartCoroutine(ShowAllCardsTemporarily());
+    }
+
+    private IEnumerator ShowAllCardsTemporarily()
+    {
+        foreach (var card in cards)
+        {
+            card.FlipCard(); // Show all cards
+        }
+
+        yield return new WaitForSeconds(2f); // Wait for 2 seconds
+
+        foreach (var card in cards)
+        {
+            if (!card.IsMatched)
+            {
+                card.FlipCard(); // Hide all unmatched cards
+            }
+        }
     }
 
     public void ClearCards()
@@ -57,6 +83,8 @@ public class CardManager : MonoBehaviour
 
         // Clear the card list
         cards.Clear();
+        activeSelection.Clear();
+        matchedCards.Clear();
     }
 
     private List<int> ShuffleList(List<int> list)
@@ -74,30 +102,100 @@ public class CardManager : MonoBehaviour
     // Manage selected cards
     private void OnCardSelected(Card selectedCard)
     {
-        if (selectedCard.isFlipped || selectedCard.IsMatched)
-            return; // Skip already flipped or matched cards
+        if (selectedCard.IsMatched || matchedCards.Contains(selectedCard))
+            return; // Skip matched cards
 
-        selectedCard.FlipCard();
+        if (activeSelection.Contains(selectedCard))
+            return; // Skip already selected cards
 
-        // Check for other flipped cards with the same ID
-        foreach (Card card in cards)
+        selectedCard.FlipCard(); // Flip the selected card
+        activeSelection.Add(selectedCard); // Add to the current selection list
+
+        // If two cards are selected, check for a match
+        if (activeSelection.Count == 2)
         {
-            if (card != selectedCard && card.isFlipped && card.CardID == selectedCard.CardID)
+            StartCoroutine(CheckSelectedCards(new List<Card>(activeSelection))); // Pass a copy of the current selection
+            activeSelection.Clear(); // Clear the active selection for new cards
+        }
+    }
+
+    private IEnumerator CheckSelectedCards(List<Card> selection)
+    {
+        Card firstCard = selection[0];
+        Card secondCard = selection[1];
+
+        yield return new WaitForSeconds(1f); // Wait briefly to show both cards
+
+        if (firstCard.CardID == secondCard.CardID)
+        {
+            // Match found
+            firstCard.SetMatched();
+            secondCard.SetMatched();
+
+            matchedCards.Add(firstCard); // Lock the matched cards
+            matchedCards.Add(secondCard);
+
+            // Update score with combo multiplier
+            if (comboManager != null)
             {
-                // Match found
-                selectedCard.SetMatched();
-                card.SetMatched();
-                scoreManager.IncreaseScore(10);
+                comboManager.IncreaseCombo(); // Increase combo multiplier
+                int comboMultiplier = comboManager.GetComboMultiplier();
+                scoreManager.IncreaseScore(10 * comboMultiplier); // Apply combo multiplier
+            }
+            else
+            {
+                scoreManager.IncreaseScore(10); // Default score increment
+            }
 
-                // Check if all cards are matched
-                if (cards.TrueForAll(c => c.IsMatched))
-                {
-                    scoreManager.ShowFinalScore(); // Show the final score
-                    levelManager.NextLevel(); // Move to the next level
-                }
-
-                return; // Match processed
+            // Check if all cards are matched
+            if (matchedCards.Count == cards.Count) // All cards are locked (matched)
+            {
+                scoreManager.ShowFinalScore(); // Show the final score
+                levelManager.NextLevel(); // Move to the next level
             }
         }
+        else
+        {
+            // No match found, flip the cards back
+            yield return new WaitForSeconds(1f); // Allow for animation/interaction delay
+            firstCard.FlipCard();
+            secondCard.FlipCard();
+
+            if (comboManager != null)
+            {
+                comboManager.ResetCombo(); // Reset combo on wrong match
+            }
+        }
+    }
+
+    // Get the current card layout (for saving)
+    public List<int> GetCurrentCardLayout()
+    {
+        List<int> layout = new List<int>();
+        foreach (Card card in cards)
+        {
+            layout.Add(card.CardID);
+        }
+        return layout;
+    }
+
+    // Set the card layout (for loading)
+    public void SetCardLayout(List<int> layout)
+    {
+        ClearCards(); // Clear existing cards
+
+        foreach (int cardID in layout)
+        {
+            GameObject cardObj = Instantiate(cardPrefab, cardContainer);
+            Card card = cardObj.GetComponent<Card>();
+            card.SetCardID(cardID);
+            card.OnCardSelected = OnCardSelected; // Bind the card selection event
+            cards.Add(card);
+        }
+
+        int rows = Mathf.CeilToInt(Mathf.Sqrt(layout.Count));
+        int columns = Mathf.CeilToInt((float)layout.Count / rows);
+
+        gridLayout.ArrangeCards(cards.ConvertAll(c => c.gameObject), rows, columns);
     }
 }
