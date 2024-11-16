@@ -37,6 +37,9 @@ public class ComboManager : MonoBehaviour
             comboTimer = comboDuration; // Reset combo timer
             ShowComboMessage();
             totalCombos++; // Increment total combo count
+
+            // Play combo sound
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.comboClip);
         }
     }
 

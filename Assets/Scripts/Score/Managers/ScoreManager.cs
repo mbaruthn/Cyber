@@ -15,6 +15,12 @@ public class ScoreManager : MonoBehaviour
         UpdateScoreUI();
     }
 
+    public void ResetScore()
+    {
+        score = 0;
+        UpdateScoreUI();
+    }
+
     private void OnApplicationQuit()
     {
         SaveScoreData(); // Automatically save score data when the application quits

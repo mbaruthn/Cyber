@@ -62,6 +62,9 @@ public class CardManager : MonoBehaviour
             card.FlipCard(); // Show all cards
         }
 
+        // Play card reveal sound
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.cardRevealClip);
+
         yield return new WaitForSeconds(2f); // Wait for 2 seconds
 
         foreach (var card in cards)
@@ -124,13 +127,16 @@ public class CardManager : MonoBehaviour
         Card firstCard = selection[0];
         Card secondCard = selection[1];
 
-        yield return new WaitForSeconds(1f); // Wait briefly to show both cards
+        yield return new WaitForSeconds(0.3f); // Wait briefly to show both cards
 
         if (firstCard.CardID == secondCard.CardID)
         {
             // Match found
             firstCard.SetMatched();
             secondCard.SetMatched();
+
+            // Play match success sound
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.matchSuccessClip);
 
             matchedCards.Add(firstCard); // Lock the matched cards
             matchedCards.Add(secondCard);
@@ -162,9 +168,12 @@ public class CardManager : MonoBehaviour
         else
         {
             // No match found, flip the cards back
-            yield return new WaitForSeconds(1f); // Allow for animation/interaction delay
+            yield return new WaitForSeconds(0.3f); // Allow for animation/interaction delay
             firstCard.FlipCard();
             secondCard.FlipCard();
+
+            // Play missmatch sound
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.missmatchClip);
 
             if (comboManager != null)
             {

@@ -7,13 +7,16 @@ public class LevelManager : MonoBehaviour
 {
     public CardManager cardManager; // Class to manage cards
     public int currentLevel = 1; // Starting level
-    private int maxLevel = 10; // Maximum level count
+    private int maxLevel = 6; // Maximum level count
 
     public Text endGameText; // UI Text to display end game message
     public float restartDelay = 3f; // Delay before restarting the game
 
     private void Start()
     {
+
+        GameObject.Find("restartGame").GetComponent<Button>().onClick.AddListener(RestartGame);
+
         // Attempt to load game data
         LoadGame();
 
@@ -39,6 +42,9 @@ public class LevelManager : MonoBehaviour
         {
             currentLevel++;
             StartLevel(currentLevel);
+            
+            // Play level complete sound
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.levelCompleteClip);
 
             // Save progress
             SaveGame();
@@ -131,14 +137,19 @@ public class LevelManager : MonoBehaviour
     }
 
     private void RestartGame()
-    {
+    { 
+        // Play restart sound
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.gameRestartClip);
+
         if (endGameText != null)
         {
             endGameText.gameObject.SetActive(false); // Hide the message
         }
-
+        FindObjectOfType<ScoreManager>().ResetScore(); // Reset score
+        FindObjectOfType<ComboManager>().ResetCombo(); // Reset combos
         currentLevel = 1;
         StartLevel(currentLevel);
+        SaveGame();
     }
 
     public void SaveGame()

@@ -69,7 +69,7 @@ public class GridLayout3D : MonoBehaviour
 
                 cards[index].transform.SetParent(cardContainer, false); // Ensure cards are children of cardContainer
 
-                cards[index].transform.localScale = new Vector2(cellSize, cellSize);
+                cards[index].transform.localScale = new Vector3(cellSize, cellSize,1);
 
                 index++;
             }
